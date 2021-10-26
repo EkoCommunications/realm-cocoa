@@ -35,7 +35,9 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 
 @interface RLMApp ()
 /// Returns all Apps which have been initialized in the current run of the application.
-+ (NSArray *)appIds;
++ (NSArray<NSString *> *)appIds;
+/// Returns all currently cached Apps
++ (NSArray<RLMApp *> *)allApps;
 /// Subscribe to notifications for this RLMApp.
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block;
 /// Unsubscribe to notifications for this RLMApp.

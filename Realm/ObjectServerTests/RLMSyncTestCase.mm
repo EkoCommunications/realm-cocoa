@@ -689,76 +689,71 @@ static NSURL *syncDirectoryForChildProcess() {
     [super tearDown];
 }
 
-- (void)setupSyncManager {
-    static NSString *s_appId;
-    if (self.isParent && s_appId) {
-        _appId = s_appId;
-    }
-    else {
-        NSError *error;
-        _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
-        if (error) {
-            NSLog(@"Failed to create app: %@", error);
-            abort();
-        }
-
-        if (self.isParent) {
-            s_appId = _appId;
-        }
-    }
-
-    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
-
-    RLMSyncManager *syncManager = self.app.syncManager;
-    syncManager.logLevel = RLMSyncLogLevelTrace;
-    syncManager.userAgent = self.name;
-}
-
 - (NSString *)appId {
     if (!_appId) {
-        [self setupSyncManager];
+        static NSString *s_appId;
+        if (self.isParent && s_appId) {
+            _appId = s_appId;
+        }
+        else {
+            NSError *error;
+            _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
+            if (error) {
+                NSLog(@"Failed to create app: %@", error);
+                abort();
+            }
+
+            if (self.isParent) {
+                s_appId = _appId;
+            }
+        }
     }
     return _appId;
 }
 
 - (RLMApp *)app {
     if (!_app) {
-        [self setupSyncManager];
+        _app = [RLMApp appWithId:self.appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
+        RLMSyncManager *syncManager = self.app.syncManager;
+        syncManager.logLevel = RLMSyncLogLevelTrace;
+        syncManager.userAgent = self.name;
     }
     return _app;
 }
 
 - (void)resetSyncManager {
-    if (!_appId) {
-        return;
-    }
+    _app = nil;
+    [self resetAppCache];
+}
 
+- (void)resetAppCache {
+    NSArray<RLMApp *> *apps = [RLMApp allApps];
     NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
-    [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
-        XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
-        [exs addObject:ex];
-        [user logOutWithCompletion:^(NSError *) {
-            [ex fulfill];
-        }];
+    for (RLMApp *app : apps) {
+        [app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
+            XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
+            [exs addObject:ex];
+            [user logOutWithCompletion:^(NSError *) {
+                [ex fulfill];
+            }];
 
-        // Sessions are removed from the user asynchronously after a logout.
-        // We need to wait for this to happen before calling resetForTesting as
-        // that expects all sessions to be cleaned up first.
-        if (user.allSessions.count) {
-            [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
-                                     evaluatedWithObject:user handler:nil]];
-        }
-    }];
+            // Sessions are removed from the user asynchronously after a logout.
+            // We need to wait for this to happen before calling resetForTesting as
+            // that expects all sessions to be cleaned up first.
+            if (user.allSessions.count) {
+                [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
+                                         evaluatedWithObject:user handler:nil]];
+            }
+        }];
+    }
 
     if (exs.count) {
         [self waitForExpectations:exs timeout:60.0];
     }
 
-    [self.app.syncManager resetForTesting];
-    [self resetAppCache];
-}
-
-- (void)resetAppCache {
+    for (RLMApp *app : apps) {
+        [app.syncManager resetForTesting];
+    }
     [RLMApp resetAppCache];
 }
 

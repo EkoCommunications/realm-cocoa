@@ -288,6 +288,11 @@ static std::mutex& s_appMutex = *new std::mutex();
     return s_apps.allKeys;
 }
 
++ (NSArray *)allApps {
+    std::lock_guard<std::mutex> lock(s_appMutex);
+    return s_apps.allValues;
+}
+
 + (void)resetAppCache {
     std::lock_guard<std::mutex> lock(s_appMutex);
     [s_apps removeAllObjects];
