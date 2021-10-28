@@ -856,16 +856,15 @@ public class Subscription<Element: Object>: AnySubscription {
 
 public protocol QueryBuilderComponent {}
 
-@resultBuilder public struct QueriesBuilder {
+@resultBuilder public struct QueryBuilder {
     public static func buildBlock(_ components: AnySubscription...) -> [AnySubscription] {
         return components
     }
-}
 
-@resultBuilder public struct QueryBuilder {
     public static func buildBlock(_ component: AnySubscription) -> AnySubscription {
         return component
     }
+
 }
 
 public protocol AnyQueryBuilderComponent {}
@@ -885,7 +884,7 @@ extension Realm {
     // Adds a query to the list of subscriptions, optional name can be provided
     // This method will throw an error in case we cannot subscribe the query
     @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-    public func subscribe(@QueriesBuilder _ to: () -> ([AnySubscription])) async throws -> [AnySubscription] {
+    public func subscribe(@QueryBuilder _ to: () -> ([AnySubscription])) async throws -> [AnySubscription] {
             // core subscribe
             fatalError()
     }
@@ -896,7 +895,7 @@ extension Realm {
     // This method contains a callblack block, if the subscription was successfully
     // added then it will return  the subscription, if not it will return an error
     @discardableResult
-    public func subscribe(@QueriesBuilder _ to: () -> ([AnySubscription]), callback: @escaping (Result<[AnySubscription], Swift.Error>) -> Void) -> SubscriptionTask {
+    public func subscribe(@QueryBuilder _ to: () -> ([AnySubscription]), callback: @escaping (Result<[AnySubscription], Swift.Error>) -> Void) -> SubscriptionTask {
         fatalError()
     }
 }
