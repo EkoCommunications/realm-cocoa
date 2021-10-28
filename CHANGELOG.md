@@ -1,5 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Xcode 12.4 is now the minimum supported version of Xcode.
+
 ### Enhancements
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
@@ -34,9 +37,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 13.0.
+* Carthage release for Swift is built with Xcode 13.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.1.
+* Xcode: 12.4-13.2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
