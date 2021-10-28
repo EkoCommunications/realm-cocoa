@@ -792,9 +792,9 @@ extension FunctionCallable {
 
 //Flexible Sync Configuration
 //Same as with partition-based sync we get the configuration from the user
-public extension User {
+extension User {
     // Returns a flexible sync configuration to open the realm
-    func flexibleSyncConfiguration() -> Realm.Configuration {
+    public func flexibleSyncConfiguration() -> Realm.Configuration {
         fatalError()
     }
 }
@@ -941,12 +941,5 @@ public enum SubscriptionState: Equatable {
     case error(Error)
     // The server is processing the subscription and updating the Realm data
     // with new matches
-    case bootstrapping
-    // Sent to the server but not acknowledged
-    case sent
-    // Subscription is persisted locally but not yet processed by the server.
     case pending
-    // Subscription has been invalidated - i.e. replaced by a call to
-    // Realm.UpdateSubscriptions()
-    case invalidated
 }
