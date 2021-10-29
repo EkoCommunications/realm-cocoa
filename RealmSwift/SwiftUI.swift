@@ -914,7 +914,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         if let appId = appId {
             app = App(id: appId)
         } else if appsIds.count == 1, // Check if there is a singular cached app
-            let cachedAppId = appsIds.first as? String {
+            let cachedAppId = appsIds.first {
             app = App(id: cachedAppId)
         } else if appsIds.count > 1 {
             throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
