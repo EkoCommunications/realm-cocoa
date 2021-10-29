@@ -104,7 +104,7 @@ namespace {
                        transport:transport
                     localAppName:localAppName
                  localAppVersion:localAppVersion
-         defaultRequestTimeoutMS:6000];
+         defaultRequestTimeoutMS:60000];
 }
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
@@ -193,7 +193,7 @@ namespace {
 }
 
 - (NSUInteger)defaultRequestTimeoutMS {
-    return _config.default_request_timeout_ms.value_or(6000U);
+    return _config.default_request_timeout_ms.value_or(60000U);
 }
 
 - (void)setDefaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {

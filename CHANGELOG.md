@@ -18,6 +18,11 @@ x.y.z Release notes (yyyy-MM-dd)
     $0.hobbies.contains("music") || $0.hobbies.contains("baseball")
   }
 
+
+  let persons = realm.objects(Person.self).where {
+    $0.hobbies.contains("music") || $0.hobbies.contains("baseball")
+  }
+
   persons = realm.objects(Person.self).where {
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
@@ -25,6 +30,10 @@ x.y.z Release notes (yyyy-MM-dd)
   
 ### Fixed
 * None.
+* Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
+  
+### Fixed
+* Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 * Decimal128 did not properly normalize the value before hashing and so could
