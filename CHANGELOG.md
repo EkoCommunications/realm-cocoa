@@ -23,6 +23,22 @@ class PersonProjection: Projection<Person> {
 
 let people: Results<PersonProjection> = realm.objects(PersonProjection.self) // `people` will contain projections for every `Person` object in the `realm`
 ```
+* Add `.searchable()` SwiftUI View Modifier which allows us to filter 
+  `@ObservedResult` results from a search field component by a key path.
+  ```swift
+  List {
+      ForEach(reminders) { reminder in
+        ReminderRowView(reminder: reminder)
+      }
+  }
+  .searchable(text: $searchFilter,
+              collection: $reminders,
+              keyPath: \.name) {
+    ForEach(reminders) { remindersFiltered in
+      Text(remindersFiltered.name).searchCompletion(remindersFiltered.name)
+    }
+  }
+  ```
 * Add an api for a type safe query syntax. This allows you to filter a Realm and collections managed by a Realm
   with Swift style expressions. Here is a brief example:
   ```swift
@@ -43,11 +59,18 @@ let people: Results<PersonProjection> = realm.objects(PersonProjection.self) // 
   persons = realm.objects(Person.self).where {
     ($0.pets.age >= 2) && $0.pets.name.starts(with: "L")
   }
-  ```([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
+  ```
+  ([Cocoa #7419](https://github.com/realm/realm-cocoa/pull/7419))
 * Add support for dictionary subscript expressions (e.g. `"phoneNumbers['Jane'] == '123-3456-123'"`) when querying with an NSPredicate.
-  
+* Add UserProfile to User. This contains metadata from social logins with MongoDB Realm.
+
+
 ### Fixed
 * Change default request timeout for `RLMApp` from 6 seconds to 60 seconds.
+* Async `Realm` init would often give a Realm instance which could not actually
+  be used and would throw incorrect thread exceptions. It now is `@MainActor`
+  and gives a Realm instance which always works on the main actor. The
+  non-functional `queue:` parameter has been removed (since v10.15.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
